@@ -1,5 +1,5 @@
 use serde_json::Value;
-use std::{error::Error, io::Read};
+use std::error::Error;
 use std::fs::File;
 use std::io::BufReader;
 use rand::Rng;
@@ -39,11 +39,17 @@ fn to_string(vec: Vec<char>) -> String {
     return result
 }
 
-fn read_line() -> String {
+fn read_line() -> Result<String,&'static str> {
     let mut buffer: String = String::new();
-    io::stdin().read_to_string(&mut buffer).expect("Read error!");
-    let buffer = buffer.trim().to_string();
-    return buffer
+    match io::stdin().read_line(&mut buffer) {
+        Ok(_) => {
+            let buffer = buffer.trim().to_string();
+            Ok(buffer)
+        }
+        Err(_) => {
+            Err("Failed to read line.")
+        }
+    }
 }
 
 fn is_char_in_word(word: String, char: char, status: Vec<char>) -> (bool,Vec<i32>) {
@@ -80,7 +86,16 @@ fn main() {
     loop {
         let user_word_string = to_string(user_word.clone());
         println!("{user_word_string}\nNumber of guesses left: {guesses_left}");
-        let user_input: String = read_line();
+        let mut user_input: String = String::new();
+        match read_line() {
+            Ok(result) => {
+                user_input = result;
+            }
+            Err(err) => {
+                println!("Error reading String! {err}");
+                continue;
+            }
+        }
         if &user_input.len().try_into().unwrap() != 1 {
             println!("You must enter one character. (len == 1)");
             continue;
