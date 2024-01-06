@@ -1,5 +1,5 @@
 use serde_json::Value;
-use std::error::Error;
+use std::{error::Error, io::Read};
 use std::fs::File;
 use std::io::BufReader;
 use rand::Rng;
@@ -41,7 +41,7 @@ fn to_string(vec: Vec<char>) -> String {
 
 fn read_line() -> String {
     let mut buffer: String = String::new();
-    io::stdin().read_line(&mut buffer).expect("Error!");
+    io::stdin().read_to_string(&mut buffer).expect("Read error!");
     let buffer = buffer.trim().to_string();
     return buffer
 }
